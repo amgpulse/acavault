@@ -1,5 +1,13 @@
 # ACA — AES-256 Vault
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![AES-256-GCM](https://img.shields.io/badge/AES-256--GCM-secure%20%26%20authenticated-brightgreen)](#crypto-parameters)
+[![Web Crypto API](https://img.shields.io/badge/Web%20Crypto%20API-browser%20native-blue)](#tech-stack)
+[![PWA](https://img.shields.io/badge/PWA-offline%20ready-orange)](#features)
+[![Dependencies](https://img.shields.io/badge/dependencies-zero-red)](#tech-stack)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow?logo=javascript&logoColor=white)](#tech-stack)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-1f6feb.svg)](CONTRIBUTING.md)
+
 > AES-256-GCM text & file encryption — client-side, zero-knowledge
 
 Secure text and file encryption/decryption with **AES-256-GCM** — fully in your browser, with zero data ever sent to a server.
