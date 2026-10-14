@@ -84,7 +84,7 @@ Secure text and file encryption/decryption with **AES-256-GCM** — fully in you
 ### Encryption
 
 ```
-Passphrase
+Passphraseo
     │
     ▼
 PBKDF2 (SHA-256, 100,000 iterations, random 16-byte salt)
@@ -169,6 +169,7 @@ First-time setup:
 No build step or package installation required:
 
 ```bash
+git clone https://github.com/amgpulse/acavault.git
 cd aes-crypto-app
 python3 -m http.server 8000
 ```
