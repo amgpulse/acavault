@@ -1,7 +1,7 @@
 # ACA — AES-256 Vault
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![AES-256-GCM](https://img.shields.io/badge/AES-256--GCM-secure%20%26%20authenticated-brightgreen)](#crypto-parameters)
+[![AES-256-GCM](https://img.shields.io/badge/AES--256--GCM-secure%20%26%20authenticated-brightgreen)](#crypto-parameters)
 [![Web Crypto API](https://img.shields.io/badge/Web%20Crypto%20API-browser%20native-blue)](#tech-stack)
 [![PWA](https://img.shields.io/badge/PWA-offline%20ready-orange)](#features)
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-red)](#tech-stack)
