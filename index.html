@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ رمزنگاری و رمزگشایی امن</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 p-2 sm:p-2.5 rounded-xl text-emerald-400 flex-shrink-0">
+                        <i class="fa-solid fa-shield-halved text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex flex-wrap items-center gap-1.5">
+                            <span data-i18n="app_name">AES-256 Vault</span>
+                            <span class="text-[10px] sm:text-xs uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono" data-i18n="gcm_secure">GCM Secure</span>
+                        </h1>
+                        <p class="text-[11px] sm:text-xs text-slate-400" data-i18n="header_subtitle">Client-side zero-knowledge encryption & decryption</p>
+                    </div>
+                </div>
+                <!-- Mobile clear button in top row -->
+                <button type="button" onclick="clearAllApp()" 
+                    class="sm:hidden bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-2.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer flex-shrink-0">
+                    <i class="fa-solid fa-trash-can text-red-400"></i> <span data-i18n="clear_all">Clear</span>
+                </button>
+                <!-- Language toggle -->
+                <button type="button" id="lang-toggle" onclick="toggleLang()" title="Switch language / تغییر زبان"
+                    class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0">
+                    <i class="fa-solid fa-language text-emerald-400"></i> <span id="lang-toggle-label">English</span>
+                </button>
+            </div>
+            <div class="hidden sm:flex items-center gap-3">
+                <button type="button" id="clear-btn" onclick="clearAllApp()" 
+                    class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-3 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-trash-can text-red-400"></i> <span data-i18n="clear_all">Clear All</span>
+                </button>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-400">
+                    <i class="fa-solid fa-lock text-emerald-400"></i> <span data-i18n="browser_crypto">Browser SubtleCrypto</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 mb-6 sm:mb-8 gap-2 sm:gap-6 overflow-x-auto pb-1" role="tablist">
+            <button id="tab-text" role="tab" aria-selected="true" onclick="switchTab('text')" 
+                class="pb-2.5 sm:pb-3 font-medium text-xs sm:text-sm border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap flex-shrink-0 px-2 sm:px-0">
+                <i class="fa-solid fa-file-lines"></i> <span data-i18n="tab_text">Text Encryption</span>
+            </button>
+            <button id="tab-file" role="tab" aria-selected="false" onclick="switchTab('file')" 
+                class="pb-2.5 sm:pb-3 font-medium text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap flex-shrink-0 px-2 sm:px-0">
+                <i class="fa-solid fa-file-arrow-down"></i> <span data-i18n="tab_file">File Encryption</span>
+            </button>
+            <button id="tab-generator" role="tab" aria-selected="false" onclick="switchTab('generator')" 
+                class="pb-2.5 sm:pb-3 font-medium text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-1.5 sm:gap-2 transition-colors whitespace-nowrap flex-shrink-0 px-2 sm:px-0">
+                <i class="fa-solid fa-key"></i> <span data-i18n="tab_generator">Key Generator</span>
+            </button>
+        </div>
+
+        <!-- TEXT TAB CONTENT -->
+        <div id="content-text" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Input / Configuration Panel -->
+                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between">
+                    <div class="space-y-5">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-emerald-400"></i> <span data-i18n="op_key">Operation & Key</span>
+                            </h2>
+                            <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
+                                <button type="button" id="mode-encrypt" onclick="setMode('encrypt')" 
+                                    class="px-3 py-1 text-xs font-medium rounded-md bg-emerald-600 text-white shadow transition-all" data-i18n="encrypt">
+                                    Encrypt
+                                </button>
+                                <button type="button" id="mode-decrypt" onclick="setMode('decrypt')" 
+                                    class="px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all" data-i18n="decrypt">
+                                    Decrypt
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Passphrase input -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label for="text-passphrase" class="block text-xs font-medium text-slate-300" data-i18n="secret_passphrase">Secret Passphrase / Key</label>
+                                <button type="button" onclick="copyPassphrase('text-passphrase', this)" class="text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
+                                    <i class="fa-regular fa-copy"></i> <span data-i18n="copy_key">Copy Key</span>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="password" id="text-passphrase" placeholder="کلید یا رمز عبور امن را وارد کنید..."
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 pe-10" data-i18n-placeholder="passphrase_placeholder">
+                                <button type="button" onclick="togglePasswordVisibility('text-passphrase', 'eye-icon-text')" class="absolute end-3 top-3 text-slate-500 hover:text-slate-300">
+                                    <i id="eye-icon-text" class="fa-solid fa-eye text-sm"></i>
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap justify-between items-center gap-1 text-xs">
+                                <span class="text-slate-500" data-i18n="pbkdf2_hint">PBKDF2 derives a 256-bit AES key.</span>
+                                <button type="button" id="generate-random-btn" onclick="generateRandomPassphrase()" class="text-emerald-400 hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-dice"></i> <span data-i18n="generate_random">Generate Random</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Input Payload -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label for="text-input" id="input-label" class="block text-xs font-medium text-slate-300" data-i18n="plaintext_input">Plaintext Input</label>
+                                <span id="text-counter" class="text-xs text-slate-500 font-mono">0 <span data-i18n="chars">chars</span></span>
+                            </div>
+                            <textarea id="text-input" rows="5" oninput="updateCounter()" placeholder="پیام محرمانه خود را اینجا تایپ یا جای‌گذاری کنید..."
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono resize-y" data-i18n-placeholder="input_placeholder_encrypt"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-slate-800/80">
+                        <button type="button" onclick="processText()" 
+                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-950/50 transition-all flex items-center justify-center gap-2">
+                            <span id="action-btn-icon"><i class="fa-solid fa-lock"></i></span>
+                            <span id="action-btn-text" data-i18n="action_btn_encrypt">Encrypt Message</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between">
+                    <div class="space-y-5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                                <i class="fa-solid fa-terminal text-emerald-400"></i> <span data-i18n="result_output">Result Output</span>
+                            </h2>
+                            <button type="button" onclick="copyOutput(this)" class="text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
+                                <i class="fa-regular fa-copy"></i> <span data-i18n="copy_output">Copy Output</span>
+                            </button>
+                        </div>
+
+                        <div class="space-y-2 flex-grow flex flex-col">
+                            <label for="text-output" id="output-label" class="block text-xs font-medium text-slate-300" data-i18n="encrypted_payload_b64">Encrypted Payload (Base64)</label>
+                            <textarea id="text-output" rows="10" readonly placeholder="خروجی امن اینجا نمایش داده می‌شود..."
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-emerald-400 placeholder-slate-600 focus:outline-none font-mono resize-y flex-grow" data-i18n-placeholder="output_placeholder"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="status-box" class="mt-6 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                        <span id="status-text" data-i18n="status_ready_encrypt">Ready for encryption. AES-256-GCM is active.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FILE TAB CONTENT -->
+        <div id="content-file" class="space-y-6 hidden">
+            <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl max-w-3xl mx-auto space-y-6">
+                <div>
+                    <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-file-shield text-emerald-400"></i> <span data-i18n="file_processor">File Cryptographic Processor</span>
+                    </h2>
+                    <p class="text-xs text-slate-400" data-i18n="file_subtitle">Securely encrypt or decrypt any file using AES-256-GCM directly in your browser.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-2" data-i18n="operation_mode">Operation Mode</label>
+                        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+                            <button type="button" id="file-mode-encrypt" onclick="setFileMode('encrypt')" 
+                                class="flex-1 py-2 text-xs font-medium rounded-lg bg-emerald-600 text-white shadow transition-all">
+                                <span data-i18n="encrypt_file">Encrypt File</span>
+                            </button>
+                            <button type="button" id="file-mode-decrypt" onclick="setFileMode('decrypt')" 
+                                class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">
+                                <span data-i18n="decrypt_file">Decrypt File</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="file-passphrase" class="block text-xs font-medium text-slate-300" data-i18n="file_passphrase">File Encryption Passphrase</label>
+                            <button type="button" onclick="copyPassphrase('file-passphrase', this)" class="text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
+                                <i class="fa-regular fa-copy"></i> <span data-i18n="copy_key">Copy Key</span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="file-passphrase" placeholder="کلید محرمانه..."
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 pe-10" data-i18n-placeholder="secret_key_placeholder">
+                            <button type="button" onclick="togglePasswordVisibility('file-passphrase', 'eye-icon-file')" class="absolute end-3 top-2.5 text-slate-500 hover:text-slate-300">
+                                <i id="eye-icon-file" class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="flex justify-end mt-1">
+                            <button type="button" id="generate-random-file-btn" onclick="generateRandomFilePassphrase()" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-dice"></i> <span data-i18n="generate_random_key">Generate Random Key</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Output Name Option -->
+                <div class="space-y-2">
+                    <label for="file-output-name" class="block text-xs font-medium text-slate-300" data-i18n="custom_filename">Custom Output Filename (Optional)</label>
+                    <input type="text" id="file-output-name" placeholder="مثلاً package.deb, song.mp3, archive.zip"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500" data-i18n-placeholder="custom_filename_placeholder">
+                    <p class="text-xs text-slate-500" data-i18n="custom_filename_hint">Specify filename with extension when decrypting if your encrypted file lacks the extension.</p>
+                </div>
+
+                <!-- Dropzone -->
+                <div class="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 rounded-2xl p-6 sm:p-8 text-center bg-slate-950/50 transition-all cursor-pointer relative"
+                     onclick="document.getElementById('file-input').click()"
+                     ondragover="event.preventDefault(); this.classList.add('border-emerald-500');"
+                     ondragleave="this.classList.remove('border-emerald-500');"
+                     ondrop="handleFileDrop(event)">
+                    <input type="file" id="file-input" onchange="handleFileSelect(this)" class="hidden">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center mx-auto text-xl">
+                            <i id="dropzone-icon" class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <p id="file-name-display" class="text-sm font-medium text-slate-200 px-2 break-all" data-i18n="upload_prompt">Click to upload or drag & drop file here</p>
+                            <p class="text-xs text-slate-500 mt-1" data-i18n="any_format_hint">Any file format supported (processed locally)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="processFile()" 
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i id="file-action-icon" class="fa-solid fa-lock"></i>
+                    <span id="file-action-text">Process File</span>
+                </button>
+
+                <div id="file-status-box" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                    <span id="file-status-text" data-i18n="file_status_default">Select a file and enter a passphrase to begin.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KEY GENERATOR TAB CONTENT -->
+        <div id="content-generator" class="space-y-6 hidden">
+            <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl max-w-3xl mx-auto space-y-6">
+                <div>
+                    <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-key text-emerald-400"></i> <span data-i18n="gen_heading">Cryptographic Key Generator</span>
+                    </h2>
+                    <p class="text-xs text-slate-400" data-i18n="gen_subtitle">Generate high-entropy random keys and passphrases for AES-256 encryption.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="gen-length" class="block text-xs font-medium text-slate-300"><span data-i18n="key_length">Key Length:</span> <span id="gen-length-val" class="text-emerald-400 font-mono">32</span> <span data-i18n="key_length_chars">chars</span></label>
+                        <input type="range" id="gen-length" min="16" max="128" step="4" value="32" oninput="document.getElementById('gen-length-val').textContent = this.value"
+                            class="w-full accent-emerald-500 bg-slate-950">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-slate-300" data-i18n="char_set">Character Set</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="gen-symbols" checked class="accent-emerald-500 rounded"> <span data-i18n="symbols">Symbols (!@#$)</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="gen-numbers" checked class="accent-emerald-500 rounded"> <span data-i18n="numbers">Numbers (0-9)</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="gen-upper" checked class="accent-emerald-500 rounded"> <span data-i18n="uppercase">Uppercase (A-Z)</span>
+                            </label>
+                            <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="gen-lower" checked class="accent-emerald-500 rounded"> <span data-i18n="lowercase">Lowercase (a-z)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="gen-output" class="block text-xs font-medium text-slate-300" data-i18n="gen_secure_key">Generated Secure Key</label>
+                        <button type="button" onclick="copyGeneratorOutput(this)" class="text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
+                            <i class="fa-regular fa-copy"></i> <span data-i18n="copy_key">Copy Key</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="gen-output" readonly placeholder="برای تولید کلیک کنید..."
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 sm:px-4 py-3 text-xs sm:text-sm text-emerald-400 font-mono focus:outline-none pe-14 sm:pe-16" data-i18n-placeholder="gen_placeholder">
+                        <button type="button" onclick="togglePasswordVisibility('gen-output', 'eye-icon-gen')" class="absolute end-3 sm:end-4 top-3.5 text-slate-500 hover:text-slate-300">
+                            <i id="eye-icon-gen" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" onclick="generateCustomKey()" 
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> <span data-i18n="gen_button">Generate Secure Key</span>
+                </button>
+
+                <!-- Action Buttons appearing upon key generation -->
+                <div id="gen-action-buttons" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <button type="button" onclick="useKeyInText()" 
+                        class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-file-lines flex-shrink-0"></i> <span class="break-words" data-i18n="gen_use_in_text">Use in Text Encryption</span>
+                    </button>
+                    <button type="button" onclick="useKeyInFile()" 
+                        class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-file-arrow-down flex-shrink-0"></i> <span class="break-words" data-i18n="gen_use_in_file">Use in File Encryption</span>
+                    </button>
+                </div>
+
+                <div id="gen-status-box" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                    <span id="gen-status-text" data-i18n="gen_status_default">Configure options and click generate.</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
+        <p data-i18n="footer_text">AES-256 Vault &bull; Zero server transmission &bull; Powered by Web Crypto API</p>
+    </footer>
+
+    <!-- Service Worker Registration for PWA Offline Support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>

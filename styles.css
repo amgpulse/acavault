@@ -1,0 +1,44 @@
+/* Custom styles and mobile polish */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+textarea {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b #020617;
+}
+
+/* Prevent iOS Safari auto-zoom on input focus */
+@media screen and (max-width: 640px) {
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* Hide scrollbar for clean tab navigation on mobile */
+.overflow-x-auto::-webkit-scrollbar {
+    display: none;
+}
+.overflow-x-auto {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
