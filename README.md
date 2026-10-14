@@ -7,8 +7,11 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-red)](#tech-stack)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow?logo=javascript&logoColor=white)](#tech-stack)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-1f6feb.svg)](CONTRIBUTING.md)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blueviolet)](https://amgpulse.github.io/acavault/)
 
 > AES-256-GCM text & file encryption — client-side, zero-knowledge
+
+**🚀 [Live Demo](https://amgpulse.github.io/acavault/)**
 
 Secure text and file encryption/decryption with **AES-256-GCM** — fully in your browser, with zero data ever sent to a server.
 
@@ -138,9 +141,24 @@ aes-crypto-app/
 ├── styles.css      # Custom styles
 ├── sw.js           # Service Worker (offline support)
 ├── manifest.json   # PWA configuration
+├── .github/
+│   └── workflows/
+│       └── deploy.yml  # GitHub Pages deployment
 ├── LICENSE         # MIT
 └── README.md
 ```
+
+---
+
+## Deployment
+
+The site is deployed automatically to **GitHub Pages** on every push to `main` via the workflow in `.github/workflows/deploy.yml`.
+
+First-time setup:
+
+1. Go to **Settings → Pages**
+2. Under **Source**, select **GitHub Actions**
+3. Push to `main` — the workflow deploys the site to `https://amgpulse.github.io/acavault/`
 
 ---
 

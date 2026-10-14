@@ -1,9 +1,10 @@
-const CACHE_NAME = 'aes-vault-v11';
+const CACHE_NAME = 'aes-vault-v12';
 const ASSETS = [
   './index.html',
   './styles.css',
   './app.js',
-  './manifest.json'
+  './manifest.json',
+  './favicon.svg'
 ];
 
 self.addEventListener('install', (e) => {
