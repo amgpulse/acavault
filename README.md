@@ -40,6 +40,7 @@ Secure text and file encryption/decryption with **AES-256-GCM** — fully in you
 ### 🔐 Text Encryption
 - Encrypt/decrypt any message with **Base64** output
 - Character counter, copy button, and show/hide password toggle
+- **Real-time passphrase strength meter** — entropy in bits + estimated crack time
 - One-click random passphrase generator
 
 ### 📁 File Encryption
@@ -55,6 +56,7 @@ Secure text and file encryption/decryption with **AES-256-GCM** — fully in you
 
 ### 🌐 PWA & Offline
 - Installable on desktop and mobile (Add to Home Screen)
+- **One-click Install button** appears automatically when the browser supports it
 - Works fully offline via a **Service Worker**
 - Bilingual UI: **Persian (RTL)** and **English**
 

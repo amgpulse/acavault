@@ -55,6 +55,9 @@ function clearAllApp() {
     const genActions = document.getElementById('gen-action-buttons');
     if (genActions) genActions.classList.add('hidden');
 
+    updateStrength('text');
+    updateStrength('file');
+
     showStatus(t('msg_cleared'), "info");
     showFileStatus(t('file_status_default'), "info");
 }
@@ -177,6 +180,7 @@ function generateRandomPassphrase() {
         result += chars.charAt(array[i] % chars.length);
     }
     document.getElementById('text-passphrase').value = result;
+    updateStrength('text');
     showStatus(t('msg_generated_passphrase'), "success");
 }
 
@@ -190,7 +194,118 @@ function generateRandomFilePassphrase() {
         result += chars.charAt(array[i] % chars.length);
     }
     document.getElementById('file-passphrase').value = result;
+    updateStrength('file');
     showFileStatus(t('msg_generated_file_passphrase'), "success");
+}
+
+// ---------- Passphrase strength meter ----------
+const CRACK_RATE = 1e10; // guesses/sec (offline fast attack)
+
+function estimateCharsetPool(pass) {
+    let pool = 0;
+    if (/[a-z]/.test(pass)) pool += 26;
+    if (/[A-Z]/.test(pass)) pool += 26;
+    if (/[0-9]/.test(pass)) pool += 10;
+    if (/[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/.test(pass)) pool += 33;
+    if (/[^\x20-\x7E]/.test(pass)) pool += 300;
+    return Math.max(pool, 1);
+}
+
+function crackSeconds(bits) {
+    if (bits <= 0) return 0;
+    return Math.pow(2, bits - 1) / CRACK_RATE;
+}
+
+function formatCrackTime(seconds) {
+    if (seconds < 1) return t('time_instant');
+    if (seconds < 60) return t('time_sec', { n: Math.max(1, Math.round(seconds)) });
+    if (seconds < 3600) return t('time_min', { n: Math.round(seconds / 60) });
+    if (seconds < 86400) return t('time_hr', { n: Math.round(seconds / 3600) });
+    const days = seconds / 86400;
+    if (days < 365.25) return t('time_day', { n: Math.round(days) });
+    const years = seconds / 31557600;
+    if (!isFinite(years) || years >= 1e15) return t('time_eternal');
+    if (years < 1000) return t('time_year', { n: Math.round(years) });
+    let y;
+    if (years >= 1e12) y = (years / 1e12).toFixed(1) + 'T';
+    else if (years >= 1e9) y = (years / 1e9).toFixed(1) + 'B';
+    else if (years >= 1e6) y = (years / 1e6).toFixed(1) + 'M';
+    else y = Math.round(years).toLocaleString('en-US');
+    return t('time_year_big', { n: y });
+}
+
+function strengthLevel(bits) {
+    if (bits < 40) return { key: 'strength_weak', pct: 25, bar: 'bg-red-500', text: 'text-red-400' };
+    if (bits < 60) return { key: 'strength_fair', pct: 50, bar: 'bg-amber-500', text: 'text-amber-400' };
+    if (bits < 80) return { key: 'strength_strong', pct: 75, bar: 'bg-emerald-500', text: 'text-emerald-400' };
+    return { key: 'strength_excellent', pct: 100, bar: 'bg-emerald-400', text: 'text-emerald-400' };
+}
+
+function updateStrength(which) {
+    const input = document.getElementById(which + '-passphrase');
+    const bar = document.getElementById(which + '-strength-bar');
+    const label = document.getElementById(which + '-strength-label');
+    const timeEl = document.getElementById(which + '-strength-time');
+    if (!input || !bar || !label || !timeEl) return;
+
+    const pass = input.value;
+    if (!pass) {
+        bar.style.width = '0%';
+        bar.className = 'h-full w-0 bg-red-500 transition-all duration-300 rounded-full';
+        label.textContent = t('strength_none');
+        label.className = 'text-slate-500';
+        timeEl.textContent = '';
+        timeEl.title = '';
+        return;
+    }
+
+    const bits = Math.round(pass.length * Math.log2(estimateCharsetPool(pass)));
+    const lvl = strengthLevel(bits);
+    bar.style.width = lvl.pct + '%';
+    bar.className = 'h-full transition-all duration-300 rounded-full ' + lvl.bar;
+    label.textContent = t(lvl.key) + ' • ' + t('strength_bits', { n: bits });
+    label.className = lvl.text;
+    const crack = formatCrackTime(crackSeconds(bits));
+    timeEl.textContent = '⏱ ' + crack;
+    timeEl.title = t('crack_est', { t: crack });
+}
+
+// ---------- PWA install button ----------
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const btn = document.getElementById('install-btn');
+    if (btn) {
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    const btn = document.getElementById('install-btn');
+    if (btn) {
+        btn.classList.add('hidden');
+        btn.classList.remove('flex');
+    }
+});
+
+function promptInstall() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+            showStatus(t('msg_installed'), 'success');
+        }
+        deferredInstallPrompt = null;
+        const btn = document.getElementById('install-btn');
+        if (btn) {
+            btn.classList.add('hidden');
+            btn.classList.remove('flex');
+        }
+    });
 }
 
 // Copy Animation Helper (Green checkmark + "Copy Success" for 2 seconds)
@@ -307,6 +422,7 @@ function useKeyInText() {
     const key = document.getElementById('gen-output').value;
     if (!key) return;
     document.getElementById('text-passphrase').value = key;
+    updateStrength('text');
     switchTab('text');
     showStatus(t('msg_key_applied_text'), "success");
 }
@@ -315,6 +431,7 @@ function useKeyInFile() {
     const key = document.getElementById('gen-output').value;
     if (!key) return;
     document.getElementById('file-passphrase').value = key;
+    updateStrength('file');
     switchTab('file');
     showFileStatus(t('msg_key_applied_file'), "success");
 }
@@ -694,7 +811,24 @@ const translations = {
     msg_key_applied_text: "Generated key applied to Text Encryption passphrase.",
     msg_key_applied_file: "Generated key applied to File Encryption passphrase.",
     msg_cleared: "All inputs and outputs cleared.",
-    msg_loaded_file: "Loaded file: {name} ({size} KB)"
+    msg_loaded_file: "Loaded file: {name} ({size} KB)",
+    strength_none: "Passphrase strength",
+    strength_weak: "Weak",
+    strength_fair: "Fair",
+    strength_strong: "Strong",
+    strength_excellent: "Excellent",
+    strength_bits: "{n} bits",
+    crack_est: "Estimated time to crack: {t}",
+    time_instant: "instantly",
+    time_sec: "{n} sec",
+    time_min: "{n} min",
+    time_hr: "{n} hr",
+    time_day: "{n} days",
+    time_year: "{n} years",
+    time_year_big: "{n} years",
+    time_eternal: "practically forever",
+    install_app: "Install",
+    msg_installed: "App installed successfully!"
   },
   fa: {
     app_title: "🛡️ رمزنگاری و رمزگشایی امن",
@@ -788,7 +922,24 @@ const translations = {
     msg_key_applied_text: "کلید تولیدشده در رمز عبور رمزنگاری متن اعمال شد.",
     msg_key_applied_file: "کلید تولیدشده در رمز عبور رمزنگاری فایل اعمال شد.",
     msg_cleared: "همه ورودی‌ها و خروجی‌ها پاک شدند.",
-    msg_loaded_file: "فایل بارگذاری شد: {name} ({size} KB)"
+    msg_loaded_file: "فایل بارگذاری شد: {name} ({size} KB)",
+    strength_none: "قدرت رمز عبور",
+    strength_weak: "ضعیف",
+    strength_fair: "متوسط",
+    strength_strong: "قوی",
+    strength_excellent: "عالی",
+    strength_bits: "{n} بیت",
+    crack_est: "زمان تخمینی برای شکستن: {t}",
+    time_instant: "آنی",
+    time_sec: "{n} ثانیه",
+    time_min: "{n} دقیقه",
+    time_hr: "{n} ساعت",
+    time_day: "{n} روز",
+    time_year: "{n} سال",
+    time_year_big: "{n} سال",
+    time_eternal: "تقریباً ابدی",
+    install_app: "نصب",
+    msg_installed: "اپلیکیشن با موفقیت نصب شد!"
   }
 };
 
@@ -814,6 +965,8 @@ function applyLanguage() {
     if (typeof updateTextModeUI === 'function') updateTextModeUI();
     if (typeof updateFileModeUI === 'function') updateFileModeUI();
     updateCounter();
+    updateStrength('text');
+    updateStrength('file');
     const box = document.getElementById('status-box');
     if (box) {
         document.getElementById('status-text').textContent = t(currentMode === 'encrypt' ? 'status_ready_encrypt' : 'status_ready_decrypt');

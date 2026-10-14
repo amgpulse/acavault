@@ -60,6 +60,11 @@
                     class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0">
                     <i class="fa-solid fa-language text-emerald-400"></i> <span id="lang-toggle-label">English</span>
                 </button>
+                <!-- PWA Install button (shown only when installable) -->
+                <button type="button" id="install-btn" onclick="promptInstall()"
+                    class="hidden bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all items-center gap-1.5 cursor-pointer flex-shrink-0">
+                    <i class="fa-solid fa-download"></i> <span data-i18n="install_app">Install</span>
+                </button>
             </div>
             <div class="hidden sm:flex items-center gap-3">
                 <button type="button" id="clear-btn" onclick="clearAllApp()" 
@@ -125,10 +130,21 @@
                             </div>
                             <div class="relative">
                                 <input type="password" id="text-passphrase" placeholder="کلید یا رمز عبور امن را وارد کنید..."
+                                    oninput="updateStrength('text')"
                                     class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 pe-10" data-i18n-placeholder="passphrase_placeholder">
                                 <button type="button" onclick="togglePasswordVisibility('text-passphrase', 'eye-icon-text')" class="absolute end-3 top-3 text-slate-500 hover:text-slate-300">
                                     <i id="eye-icon-text" class="fa-solid fa-eye text-sm"></i>
                                 </button>
+                            </div>
+                            <!-- Passphrase strength meter -->
+                            <div class="space-y-1.5">
+                                <div class="h-1.5 w-full bg-slate-950 border border-slate-800 rounded-full overflow-hidden">
+                                    <div id="text-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-300 rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between items-center gap-2 text-xs">
+                                    <span id="text-strength-label" class="text-slate-500" data-i18n="strength_none">Passphrase strength</span>
+                                    <span id="text-strength-time" class="text-slate-500 font-mono"></span>
+                                </div>
                             </div>
                             <div class="flex flex-wrap justify-between items-center gap-1 text-xs">
                                 <span class="text-slate-500" data-i18n="pbkdf2_hint">PBKDF2 derives a 256-bit AES key.</span>
@@ -217,13 +233,24 @@
                                 <i class="fa-regular fa-copy"></i> <span data-i18n="copy_key">Copy Key</span>
                             </button>
                         </div>
-                        <div class="relative">
-                            <input type="password" id="file-passphrase" placeholder="کلید محرمانه..."
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 pe-10" data-i18n-placeholder="secret_key_placeholder">
-                            <button type="button" onclick="togglePasswordVisibility('file-passphrase', 'eye-icon-file')" class="absolute end-3 top-2.5 text-slate-500 hover:text-slate-300">
-                                <i id="eye-icon-file" class="fa-solid fa-eye text-sm"></i>
-                            </button>
-                        </div>
+                            <div class="relative">
+                                <input type="password" id="file-passphrase" placeholder="کلید محرمانه..."
+                                    oninput="updateStrength('file')"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 pe-10" data-i18n-placeholder="secret_key_placeholder">
+                                <button type="button" onclick="togglePasswordVisibility('file-passphrase', 'eye-icon-file')" class="absolute end-3 top-2.5 text-slate-500 hover:text-slate-300">
+                                    <i id="eye-icon-file" class="fa-solid fa-eye text-sm"></i>
+                                </button>
+                            </div>
+                            <!-- Passphrase strength meter -->
+                            <div class="space-y-1.5">
+                                <div class="h-1.5 w-full bg-slate-950 border border-slate-800 rounded-full overflow-hidden">
+                                    <div id="file-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-300 rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between items-center gap-2 text-xs">
+                                    <span id="file-strength-label" class="text-slate-500" data-i18n="strength_none">Passphrase strength</span>
+                                    <span id="file-strength-time" class="text-slate-500 font-mono"></span>
+                                </div>
+                            </div>
                         <div class="flex justify-end mt-1">
                             <button type="button" id="generate-random-file-btn" onclick="generateRandomFilePassphrase()" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
                                 <i class="fa-solid fa-dice"></i> <span data-i18n="generate_random_key">Generate Random Key</span>
