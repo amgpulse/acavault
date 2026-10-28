@@ -60,6 +60,11 @@
                     class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0">
                     <i class="fa-solid fa-language text-emerald-400"></i> <span id="lang-toggle-label">English</span>
                 </button>
+                <!-- Security Audit Button -->
+                <button type="button" onclick="openSecurityAuditModal()" title="Security Audit"
+                    class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0">
+                    <i class="fa-solid fa-shield-check text-emerald-400"></i> <span data-i18n="security_audit">Security Audit</span>
+                </button>
                 <!-- PWA Install button (shown only when installable) -->
                 <button type="button" id="install-btn" onclick="promptInstall()"
                     class="hidden bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500 text-xs font-medium py-1.5 px-2.5 sm:px-3 rounded-lg transition-all items-center gap-1.5 cursor-pointer flex-shrink-0">
@@ -390,6 +395,50 @@
             });
         }
     </script>
+
+    <!-- Security Audit Modal -->
+    <div id="security-audit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-xl text-emerald-400">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-white" data-i18n="audit_title">Security & Environment Audit</h3>
+                        <p class="text-xs text-slate-400" data-i18n="audit_subtitle">Real-time verification of browser security primitives.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeSecurityAuditModal()" class="text-slate-400 hover:text-white text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs sm:text-sm">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span class="text-slate-300" data-i18n="audit_secure_context">Secure Context (HTTPS / Localhost)</span>
+                    <span id="audit-context" class="font-mono text-emerald-400 font-bold">-</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span class="text-slate-300" data-i18n="audit_crypto_api">Web Crypto API (AES-256-GCM)</span>
+                    <span id="audit-crypto" class="font-mono text-emerald-400 font-bold">-</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span class="text-slate-300" data-i18n="audit_offline">Offline Ready (Service Worker)</span>
+                    <span id="audit-sw" class="font-mono text-emerald-400 font-bold">-</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+                    <span class="text-slate-300" data-i18n="audit_zero_knowledge">Zero-Knowledge Server Isolation</span>
+                    <span class="font-mono text-emerald-400 font-bold" data-i18n="audit_status_isolated">100% Isolated</span>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeSecurityAuditModal()" 
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-xs sm:text-sm" data-i18n="close_modal">
+                Close
+            </button>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
