@@ -1,4 +1,32 @@
-/* Custom styles and mobile polish */
+:root {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scrollbar-color: #334155 #020617;
+}
+
+body {
+    background-image:
+        radial-gradient(ellipse at 50% -20%, rgb(16 185 129 / 8%), transparent 48%),
+        linear-gradient(180deg, #020617 0%, #050b18 100%);
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #34d399;
+    outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -9,36 +37,200 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 4px;
+    background: #334155;
+    border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #475569;
 }
 
 textarea {
     scrollbar-width: thin;
-    scrollbar-color: #1e293b #020617;
+    scrollbar-color: #334155 #020617;
 }
 
-/* Prevent iOS Safari auto-zoom on input focus */
-@media screen and (max-width: 640px) {
-    input[type="text"],
-    input[type="password"],
-    input[type="email"],
-    input[type="number"],
-    textarea,
-    select {
-        font-size: 16px !important;
-    }
-}
-
-/* Hide scrollbar for clean tab navigation on mobile */
 .overflow-x-auto::-webkit-scrollbar {
     display: none;
 }
+
 .overflow-x-auto {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+@media (max-width: 640px) {
+    html,
+    body {
+        min-width: 320px;
+        overflow-x: clip;
+    }
+
+    header > div {
+        align-items: stretch;
+        gap: 0.65rem;
+        padding: 0.7rem 0.875rem;
+    }
+
+    header > div > div:first-child {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.4rem;
+        min-width: 0;
+    }
+
+    header > div > div:first-child > div:first-child {
+        flex: 1 0 100%;
+        min-width: 0;
+        gap: 0.65rem;
+    }
+
+    header > div > div:first-child > div:first-child > div:first-child {
+        padding: 0.55rem;
+    }
+
+    header h1 {
+        gap: 0.35rem;
+        font-size: 0.95rem;
+    }
+
+    header h1 span {
+        font-size: 0.6rem;
+    }
+
+    header p {
+        display: none;
+    }
+
+    header > div > div:first-child > button {
+        min-height: 40px;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.7rem;
+    }
+
+    main {
+        padding: 1rem 0.75rem 1.5rem !important;
+    }
+
+    main > [role="tablist"] {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.25rem;
+        overflow: visible;
+        margin-bottom: 1rem;
+        padding: 0.25rem;
+        border: 1px solid rgb(51 65 85 / 65%);
+        border-radius: 1rem;
+        background: rgb(15 23 42 / 72%);
+    }
+
+    #tab-text,
+    #tab-file,
+    #tab-generator {
+        display: flex;
+        min-width: 0;
+        min-height: 48px;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.55rem 0.25rem;
+        border-radius: 0.7rem;
+        border-bottom-width: 0;
+        font-size: 0.7rem;
+        line-height: 1.25;
+        text-align: center;
+        white-space: normal;
+    }
+
+    #tab-text[aria-selected="true"],
+    #tab-file[aria-selected="true"],
+    #tab-generator[aria-selected="true"] {
+        background: rgb(16 185 129 / 12%);
+        box-shadow: inset 0 0 0 1px rgb(52 211 153 / 18%);
+    }
+
+    #content-text .grid {
+        gap: 1rem;
+    }
+
+    #content-text .grid > div,
+    #content-file > div,
+    #content-generator > div {
+        padding: 1rem;
+        border-radius: 1.25rem;
+        box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+    }
+
+    main button {
+        min-height: 40px;
+    }
+
+    #mode-encrypt,
+    #mode-decrypt {
+        min-height: 40px;
+        padding-inline: 0.85rem;
+    }
+
+    main input:not([type="checkbox"]):not([type="range"]) {
+        min-height: 46px;
+    }
+
+    main textarea {
+        min-height: 150px;
+        padding: 0.85rem;
+        line-height: 1.65;
+    }
+
+    #text-output {
+        min-height: 170px;
+    }
+
+    #content-file .border-dashed {
+        min-height: 160px;
+        display: grid;
+        align-items: center;
+        padding: 1.25rem 0.75rem;
+    }
+
+    #content-generator input[type="range"] {
+        min-height: 40px;
+    }
+
+    .relative > button {
+        width: 44px;
+        height: 44px;
+        min-height: 44px;
+        top: 50%;
+        display: grid;
+        place-items: center;
+        transform: translateY(-50%);
+    }
+
+    #security-audit-modal {
+        align-items: flex-end;
+        padding: 0.75rem;
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
+
+    #security-audit-modal > div {
+        max-height: min(86dvh, 680px);
+        overflow-y: auto;
+        padding: 1.1rem;
+        border-radius: 1.4rem 1.4rem 1rem 1rem;
+    }
+
+    footer {
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

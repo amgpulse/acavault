@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aes-vault-v12';
+const CACHE_NAME = 'aes-vault-v13';
 const ASSETS = [
   './index.html',
   './styles.css',

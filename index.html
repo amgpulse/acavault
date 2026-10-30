@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>🛡️ رمزنگاری و رمزگشایی امن</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <!-- PWA Manifest -->
@@ -397,7 +397,7 @@
     </script>
 
     <!-- Security Audit Modal -->
-    <div id="security-audit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div id="security-audit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="audit-title">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6">
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div class="flex items-center gap-3">
@@ -405,7 +405,7 @@
                         <i class="fa-solid fa-shield-halved text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm sm:text-base font-bold text-white" data-i18n="audit_title">Security & Environment Audit</h3>
+                        <h3 id="audit-title" class="text-sm sm:text-base font-bold text-white" data-i18n="audit_title">Security & Environment Audit</h3>
                         <p class="text-xs text-slate-400" data-i18n="audit_subtitle">Real-time verification of browser security primitives.</p>
                     </div>
                 </div>
